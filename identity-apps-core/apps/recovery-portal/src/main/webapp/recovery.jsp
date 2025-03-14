@@ -366,7 +366,7 @@
                     request.setAttribute("screenValue", request.getParameter("screenValue"));
                     request.setAttribute("resendCode", recoveryResponse.getResendCode());
                     request.setAttribute("flowConfirmationCode", recoveryResponse.getFlowConfirmationCode());
-                    request.getRequestDispatcher("sms-otp.jsp").forward(request, response);
+                    request.getRequestDispatcher("otp.jsp").forward(request, response);
                 } else {
                     request.setAttribute("error", true);
                     request.setAttribute("errorMsg", IdentityManagementEndpointUtil.i18n(recoveryResourceBundle,
@@ -397,8 +397,16 @@
         } else {
             request.setAttribute("username", username);
             session.setAttribute("username", username);
+            
 
             if (IdentityManagementEndpointConstants.PasswordRecoveryOptions.EMAIL.equals(recoveryOption)) {
+                Boolean isEmailOtpBasedPasswordRecoveryEnabledByTenant = Boolean.parseBoolean(
+                    request.getParameter("isEmailOtpBasedPasswordRecoveryEnabledByTenant"));
+                if (isEmailOtpBasedPasswordRecoveryEnabledByTenant) {
+                    request.setAttribute("channel", IdentityManagementEndpointConstants.PasswordRecoveryOptions.EMAIL);
+                    request.getRequestDispatcher("password-recovery-otp.jsp").forward(request, response);
+                    return;
+                }
                 request.setAttribute("callback", callback);
                 request.getRequestDispatcher("password-recovery-notify.jsp").forward(request, response);
             } else if(IdentityManagementEndpointConstants.PasswordRecoveryOptions.SMSOTP.equals(recoveryOption)) {
